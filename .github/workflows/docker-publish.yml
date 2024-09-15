@@ -23,7 +23,7 @@ jobs:
     permissions:
       contents: write
       packages: write
-      id-token: write     
+      id-token: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -50,9 +50,9 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{github.repository}}/backend
+          images: ${{ env.REGISTRY }}/${{github.actor}}/backend
           labels: |
-            org.opencontainers.image.description="Backend to control the camera module"
+            org.opencontainers.image.description=Backend to control the camera module
             org.opencontainers.image.licenses=MIT
 
       # Build and push Docker image with Buildx (don't push on PR)
