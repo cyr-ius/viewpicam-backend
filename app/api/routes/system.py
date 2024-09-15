@@ -3,7 +3,7 @@
 import semver
 from aiohttp import ClientError, ClientSession
 from fastapi import APIRouter, HTTPException, Query
-from sqlalchemy import select
+from sqlmodel import select
 
 from app.api.depends import SessionDep
 from app.core.config import Locale, Type, config
@@ -110,7 +110,7 @@ async def get_presets(
 ) -> list[Presets]:
     """Presets video."""
     if preset:
-        return session.execute(select(Presets).filter_by(mode=preset)).scalars().all()
+        return session.exec(select(Presets).filter_by(mode=preset)).all()
     return session.get_all(Presets)
 
 

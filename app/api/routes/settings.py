@@ -5,7 +5,7 @@ from datetime import datetime as dt
 
 from fastapi import APIRouter, HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
-from sqlalchemy import delete
+from sqlmodel import delete
 
 from app.api.depends import SessionDep
 from app.core.config import config
@@ -80,7 +80,7 @@ async def get_backup():
 async def post_restore(session: SessionDep, file: UploadFile):
     if file and allowed_file(file):
         zip_extract(file.file, config.CONFIG_FOLDER)
-        session.execute(delete(Files))
+        session.exec(delete(Files))
         session.commit()
         update_img_db()
 

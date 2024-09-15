@@ -1,7 +1,7 @@
 """Blueprint Users API."""
 
 from fastapi import APIRouter, Request, Response
-from sqlalchemy import select
+from sqlmodel import select
 
 from app.api.depends import SessionDep
 from app.core.config import Locale
@@ -14,7 +14,7 @@ router = APIRouter()
 @router.get("/")
 async def get(session: SessionDep) -> list[UserPublic]:
     """List users."""
-    return session.execute(select(User).filter(User.id > 0)).scalars().all()
+    return session.exec(select(User)).all()
 
 
 @router.post("/", status_code=204)

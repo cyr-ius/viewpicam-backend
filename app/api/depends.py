@@ -6,8 +6,7 @@ from fastapi import Depends, HTTPException, Security, status
 from fastapi.security import APIKeyCookie, HTTPBearer
 from jwt.exceptions import InvalidTokenError
 from pydantic import ValidationError
-from sqlalchemy import select
-from sqlalchemy.orm import Session, sessionmaker
+from sqlmodel import Session, select
 
 from app.core.config import config
 from app.core.db import engine
@@ -17,7 +16,7 @@ from app.models import TokenPayload, User
 
 def get_or_404(self, Table, id, *, error_desc: str | None = None):
     """Get by id or return 404"""
-    item = self.execute(select(Table).filter_by(id=id)).scalars().first()
+    item = self.exec(select(Table).filter_by(id=id)).first()
     if item is None:
         raise HTTPException(404, error_desc)
     return item
@@ -25,7 +24,7 @@ def get_or_404(self, Table, id, *, error_desc: str | None = None):
 
 def get_all(self, Table, *, error_desc: str | None = None):
     """Get by id or return 404"""
-    item = self.execute(select(Table)).scalars().all()
+    item = self.exec(select(Table)).all()
     if item is None:
         raise HTTPException(404, error_desc)
     return item
@@ -39,11 +38,6 @@ def get_db() -> Generator[Session, None, None]:
 
 
 SessionDep = Annotated[Session, Depends(get_db)]
-
-
-def get_session():
-    Session = sessionmaker(bind=engine)
-    return Session
 
 
 async def protected(
@@ -88,7 +82,7 @@ def get_current_active_superuser(current_user: CurrentUser) -> User:
 
 
 def check_superuser_exists(session: SessionDep) -> bool:
-    search = session.execute(select(User).filter(User.right == 8)).scalars().first()
+    search = session.exec(select(User).filter(User.right == 8)).first()
     return search is not None
 
 

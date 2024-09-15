@@ -7,7 +7,7 @@ from datetime import timezone
 import pytz
 import zoneinfo
 from fastapi import APIRouter, HTTPException
-from sqlalchemy import select
+from sqlmodel import select
 from suntime import Sun
 
 from app.api.depends import SessionDep
@@ -59,26 +59,18 @@ async def put(schedule: Schedule):
 async def put_scheduler(session: SessionDep, scheduler: list[SchedulerUpdate]):
     """Set settings."""
     for item in scheduler:
-        schedule = (
-            session.execute(
-                select(Scheduler).filter_by(
-                    daysmode_id=item.daysmode.id, id=int(item.id)
-                )
-            )
-            .scalars()
-            .first()
-        )
+        schedule = session.exec(
+            select(Scheduler).filter_by(daysmode_id=item.daysmode.id, id=int(item.id))
+        ).first()
         schedule.command_on = item.command_on
         schedule.command_off = item.command_off
         schedule.mode = item.mode
         schedule.calendars = []
         for key, value in item.calendars.items():
             if value:
-                cal = (
-                    session.execute(select(Calendar).filter_by(name=key.capitalize()))
-                    .scalars()
-                    .first()
-                )
+                cal = session.exec(
+                    select(Calendar).filter_by(name=key.capitalize())
+                ).first()
                 schedule.calendars.append(cal)
         session.commit()
 
@@ -126,11 +118,7 @@ async def get_scheduler(
 ) -> list[SchedulerWithCalendars]:
     """Get settings scheduler."""
     if daymode_id is not None:
-        return (
-            session.execute(select(Scheduler).filter_by(daysmode_id=daymode_id))
-            .scalars()
-            .all()
-        )
+        return session.exec(select(Scheduler).filter_by(daysmode_id=daymode_id)).all()
     return session.get_all(Scheduler)
 
 
@@ -185,68 +173,40 @@ def get_calendar(session: SessionDep, daymode: int) -> int:
         case 0:
             if now < (sunrise + td(minutes=data["dawnstart_minutes"])):
                 # Night
-                mem_sch = (
-                    session.execute(
-                        select(Scheduler).filter_by(period="night", daysmode_id=daymode)
-                    )
-                    .scalars()
-                    .first()
-                )
+                mem_sch = session.exec(
+                    select(Scheduler).filter_by(period="night", daysmode_id=daymode)
+                ).first()
             elif now < (sunrise + td(minutes=data["daystart_minutes"])):
                 # Dawn
-                mem_sch = (
-                    session.execute(
-                        select(Scheduler).filter_by(period="dawn", daysmode_id=daymode)
-                    )
-                    .scalars()
-                    .first()
-                )
+                mem_sch = session.exec(
+                    select(Scheduler).filter_by(period="dawn", daysmode_id=daymode)
+                ).first()
             elif now > (sunset + td(minutes=data["duskend_minutes"])):
                 # Night
-                mem_sch = (
-                    session.execute(
-                        select(Scheduler).filter_by(period="night", daysmode_id=daymode)
-                    )
-                    .scalars()
-                    .first()
-                )
+                mem_sch = session.exec(
+                    select(Scheduler).filter_by(period="night", daysmode_id=daymode)
+                ).first()
 
             elif now > (sunset + td(minutes=data["dayend_minutes"])):
                 # Dusk
-                mem_sch = (
-                    session.execute(
-                        select(Scheduler).filter_by(period="dusk", daysmode_id=daymode)
-                    )
-                    .scalars()
-                    .first()
-                )
+                mem_sch = session.exec(
+                    select(Scheduler).filter_by(period="dusk", daysmode_id=daymode)
+                ).first()
 
             else:
                 # Day
-                mem_sch = (
-                    session.execute(
-                        select(Scheduler).filter_by(period="day", daysmode_id=daymode)
-                    )
-                    .scalars()
-                    .first()
-                )
+                mem_sch = session.exec(
+                    select(Scheduler).filter_by(period="day", daysmode_id=daymode)
+                ).first()
 
         case 1:
             # AllDay
-            mem_sch = (
-                session.execute(
-                    select(Scheduler).filter_by(period="allday", daysmode_id=daymode)
-                )
-                .scalars()
-                .first()
-            )
+            mem_sch = session.exec(
+                select(Scheduler).filter_by(period="allday", daysmode_id=daymode)
+            ).first()
         case 2:
             # Times
-            schedulers = (
-                session.execute(select(Scheduler).filter_by(daysmode_id=2))
-                .scalars()
-                .all()
-            )
+            schedulers = session.exec(select(Scheduler).filter_by(daysmode_id=2)).all()
             max_less_v = -1
             for scheduler in schedulers:
                 str_time = scheduler.period

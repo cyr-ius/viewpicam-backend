@@ -10,8 +10,7 @@ from datetime import datetime as dt
 from io import BytesIO
 from typing import Any
 
-from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlmodel import Session, select
 
 from app.core.config import config
 from app.core.db import engine
@@ -327,7 +326,7 @@ def update_img_db() -> None:
     """Add thumb to database."""
     media_path = raspiconfig.media_path
     with Session(engine) as session:
-        files = session.execute(select(Files.id)).scalars().all()
+        files = session.exec(select(Files.id)).all()
         for thumb in list_folder_files(media_path):
             if (
                 is_thumbnail(thumb)

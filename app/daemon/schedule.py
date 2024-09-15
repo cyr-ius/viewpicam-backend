@@ -6,8 +6,7 @@ import time
 from datetime import datetime as dt
 from typing import Any
 
-from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlmodel import Session, select
 
 from app.api.routes.schedule import dt_now, get_calendar
 from app.core.config import config

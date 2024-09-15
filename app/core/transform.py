@@ -3,8 +3,7 @@ import shutil
 from datetime import datetime as dt
 
 from fastapi import HTTPException
-from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlmodel import Session, select
 
 from app.core.config import config
 from app.core.db import engine

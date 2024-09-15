@@ -14,8 +14,8 @@ from fastapi import (
     status,
 )
 from pyotp import TOTP
-from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
+from sqlmodel import select
 
 from app.api.depends import CheckSuperUser, CurrentUser, SessionDep
 from app.core.config import config
@@ -58,9 +58,7 @@ already_exists = HTTPException(
 async def authorize(
     session: SessionDep, login: Login, response: Response
 ) -> TokenInfo | str:
-    user = (
-        session.execute(select(User).filter_by(name=login.username)).scalars().first()
-    )
+    user = session.exec(select(User).filter_by(name=login.username)).first()
 
     if user is None or user.enabled is False:
         raise authorize_exception
