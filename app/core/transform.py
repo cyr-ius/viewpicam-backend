@@ -69,14 +69,14 @@ def get_thumbs(sort_order: str, show_types: str, time_filter: int):
 
     with Session(engine) as session:
         if (time_filter := int(time_filter)) == 1:
-            files = session.scalars(
+            files = session.exec(
                 select(Files).filter(Files.type.in_(show_types)).order_by(order)
             )
         elif time_filter == config.TIME_FILTER_MAX:
             dt_search = dt.fromtimestamp(
                 dt.now().timestamp() - (86400 * (time_filter - 2))
             )
-            files = session.scalars(
+            files = session.exec(
                 select(Files)
                 .filter(Files.type.in_(show_types), Files.datetime <= dt_search)
                 .order_by(order)
@@ -84,7 +84,7 @@ def get_thumbs(sort_order: str, show_types: str, time_filter: int):
         else:
             dt_lw = dt.fromtimestamp(dt.now().timestamp() - (86400 * (time_filter - 2)))
             dt_gt = dt.fromtimestamp(dt.now().timestamp() - (time_filter - 1) * 86400)
-            files = session.scalars(
+            files = session.exec(
                 select(Files)
                 .filter(
                     Files.type.in_(show_types),
