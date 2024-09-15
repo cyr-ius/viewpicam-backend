@@ -35,6 +35,9 @@ app = FastAPI(
     title=config.SITE_NAME,
     debug=config.DEBUG,
     generate_unique_id_function=custom_generate_unique_id,
+    openapi_url="/api/v1/openapi.json",
+    docs_url="/api/v1/docs", 
+    redoc_url="api/v1/redoc"
 )
 
 # Start Raspiconfig
