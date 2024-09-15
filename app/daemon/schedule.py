@@ -67,7 +67,7 @@ def scheduler() -> None:
                 if cmd == config.SCHEDULE_STOP and autocapture == 0:
                     if last_on_cmd:
                         write_log("Stop capture requested")
-                        schedule = session.scalars(
+                        schedule = session.exec(
                             select(Scheduler).filter_by(period=last_day_period)
                         ).one()
                         send = schedule.command_off
@@ -87,7 +87,7 @@ def scheduler() -> None:
                             write_log("Start capture requested from Pipe")
                             data["last_detection_start"] = str(dt_now())
                             session.commit()
-                        schedule = session.scalars(
+                        schedule = session.exec(
                             select(Scheduler).filter_by(period=last_day_period)
                         ).one()
                         send = schedule.command_on
@@ -123,7 +123,7 @@ def scheduler() -> None:
                                 write_log(
                                     "Maximum Capture reached. Sending off command"
                                 )
-                                schedule = session.scalars(
+                                schedule = session.exec(
                                     select(Scheduler).filter_by(period=last_day_period)
                                 ).one()
                                 send_cmds(str_cmd=schedule.command_off)
@@ -137,7 +137,7 @@ def scheduler() -> None:
                             new_day_period = get_calendar(session, data["daymode"])
                             if new_day_period != last_day_period:
                                 write_log(f"New period detected {new_day_period}")
-                                schedule = session.scalars(
+                                schedule = session.exec(
                                     select(Scheduler).filter_by(period=new_day_period)
                                 ).one()
                                 send_cmds(
