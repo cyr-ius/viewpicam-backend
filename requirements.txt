@@ -3,7 +3,7 @@ alembic==1.13.2
 atomicwrites==1.4.1
 fastapi[standard]==0.114.2
 psutil==6.0.0
-pydantic-settings==2.4.0
+pydantic-settings==2.5.2
 pydantic==2.9.1
 pyjwt==2.9.0
 pyotp==2.9.0
