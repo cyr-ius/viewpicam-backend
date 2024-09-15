@@ -8,7 +8,7 @@ pydantic==2.9.1
 pyjwt==2.9.0
 pyotp==2.9.0
 python-multipart==0.0.9
-pytz==2024.1
+pytz==2024.2
 qrcode==7.4.2
 semver==3.0.2
 sqlalchemy==2.0.34
