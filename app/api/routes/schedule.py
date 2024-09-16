@@ -105,10 +105,10 @@ async def get_gmtoffset(session: SessionDep):
 
 
 @router.get("/timezones", status_code=201)
-async def get_timezone():
+async def get_timezone() -> list[str]:
     """Timezone."""
     timezones = zoneinfo.available_timezones()
-    return list(timezones), 201
+    return list(timezones)
 
 
 @router.get("/scheduler")
