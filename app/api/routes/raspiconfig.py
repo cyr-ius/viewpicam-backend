@@ -29,6 +29,7 @@ async def get(
 async def post(command: Command):
     """Send command to control fifo."""
     try:
+        cmd = command.cmd
         if params := command.params:
             params = [str(item) for item in params]
             params = " ".join(params)
