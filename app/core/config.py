@@ -107,11 +107,11 @@ class Config(BaseSettings):
     SVC_SCHEDULER: bool = True
 
     # Schedule state
-    SCHEDULE_RESET: int = 9
-    SCHEDULE_UPDATE_VID: int = 8
-    SCHEDULE_UPDATE_IMG: int = 7
-    SCHEDULE_START: int = 1
-    SCHEDULE_STOP: int = 0
+    SCHEDULE_RESET: str = "9"
+    SCHEDULE_UPDATE_VID: str = "8"
+    SCHEDULE_UPDATE_IMG: str = "7"
+    SCHEDULE_START: str = "1"
+    SCHEDULE_STOP: str = "0"
 
     # Motion
     MOTION_URL: str = "http://127.0.0.1:6642/0/"
