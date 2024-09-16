@@ -54,11 +54,11 @@ async def post_macro(macro: Macro):
     if macro:
         config = await _async_get_config()
         for idx, name in enumerate(config.keys()):
-            if macro["name"] == name:
+            if macro.name == name:
                 break
 
-        cmd = macro["command"]
-        if not macro["state"]:
+        cmd = macro.command
+        if not macro.state:
             cmd = f"-{cmd}"
         try:
             raspiconfig.send(f"um {idx} {cmd}")
