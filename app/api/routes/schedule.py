@@ -100,8 +100,8 @@ async def get_sunset(session: SessionDep) -> Date_Time:
 @router.get("/gmtoffset", status_code=201)
 async def get_gmtoffset(session: SessionDep):
     """GMT Offset."""
-    settings = session.get_or_404(Settings, 0)
-    return {"gmt_offset": settings.data["gmt_offset"]}
+    data = read()
+    return {"gmt_offset": data["gmt_offset"]}
 
 
 @router.get("/timezones", status_code=201)
