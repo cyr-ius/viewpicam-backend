@@ -63,7 +63,7 @@ def scheduler() -> None:
             last_status_time = os.path.getmtime(raspiconfig.status_file)
             while timeout_max == 0 or timeout < timeout_max:
                 time.sleep(poll_time)
-                cmd = read_pipe(motion_fifo_in)
+                cmd = int(read_pipe(motion_fifo_in))
                 if cmd == config.SCHEDULE_STOP and autocapture == 0:
                     if last_on_cmd:
                         write_log("Stop capture requested")
