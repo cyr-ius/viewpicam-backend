@@ -14,7 +14,7 @@ router = APIRouter()
 
 @router.get("/")
 async def get(
-    reverse: bool = Query(description="Ordering display (True|False)"),
+    reverse: bool = Query(description="Ordering display (True|False)",default=True),
 ) -> list[Log]:
     """List log."""
     return get_logs(reverse)
