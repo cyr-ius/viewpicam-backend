@@ -35,6 +35,6 @@ def set_timezone(timezone: str) -> None:
     """Set localtime and timezone."""
     try:
         write_log(f"Set timezone {timezone}")
-        execute_cmd(f"copy -f /usr/share/zoneinfo/{timezone} /etc/localtime")
+        execute_cmd(f"cp -f /usr/share/zoneinfo/{timezone} /etc/localtime")
     except Exception as error:
         logger.error(error)
