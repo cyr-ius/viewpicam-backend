@@ -34,7 +34,6 @@ class Right(int, Enum):
 
 class Config(BaseSettings):
     model_config = SettingsConfigDict(
-        env_prefix="VIEWPICAM_",
         env_file=(".env", ".secret_key"),
         env_file_encoding="utf-8",
         env_ignore_empty=True,
@@ -58,7 +57,7 @@ class Config(BaseSettings):
     MASK_FILENAME: str = "motionmask.pgm"
 
     # Url and timeout to fetch version from github
-    GIT_URL: str = "https://api.github.com/repos/cyr-ius/viewpi-cam/releases/latest"
+    GIT_URL: str = "https://api.github.com/repos/cyr-ius/viewpicam-backend/releases/latest"
     TIMEOUT: int = 10
 
     # File where default settings
