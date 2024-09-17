@@ -391,7 +391,7 @@ class LockMode(BaseModel):
 
 class Command(BaseModel):
     cmd: str = Field(description="Command")
-    params: list[str] | None = Field(description="Parameters", default=None)
+    params: list[str | int] | None = Field(description="Parameters", default=None)
 
 
 class Rsync(BaseModel):
