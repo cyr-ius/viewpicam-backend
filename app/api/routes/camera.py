@@ -33,21 +33,10 @@ def cam_pictl():
     return Response(last_jpeg, headers={"Content-Type": "image/jpeg"})
 
 
-# @router.get("/cam_get")
-# def cam_get():
-#     os.popen(f"touch {config.root_path}/status_mjpeg.txt")
-#     cam_jpg = _get_shm_cam()
-#     return Response(cam_jpg, headers={"Content-Type": "image/jpeg"})
-
-
 @router.get("/cam_pic_new")
 def cam_pic_new(delay: int = 100):
     delay = float(delay / 1000)  # Unit (ms)
     preview_path = raspiconfig.preview_path
-    # return Response(
-    #     _gather_img(preview_path, delay),
-    #     mimetype="multipart/x-mixed-replace; boundary=PIderman",
-    # )
     return StreamingResponse(
         _gather_img(preview_path, delay),
         media_type="multipart/x-mixed-replace; boundary=PIderman",
