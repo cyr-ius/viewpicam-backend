@@ -57,7 +57,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           labels: |
             org.opencontainers.image.description=Backend to control the camera module
-            org.opencontainers.image.licenses=${{ env.IMAGE_LICENSE}}
+            org.opencontainers.image.licenses=MIT
 
 
       # Build and push Docker image with Buildx (don't push on PR)
