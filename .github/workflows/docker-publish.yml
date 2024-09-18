@@ -94,6 +94,9 @@ jobs:
           
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     timeout-minutes: 5
     needs: build
     steps:      
