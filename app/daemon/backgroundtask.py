@@ -47,9 +47,9 @@ async def stop_task():
 @router.get("/status")
 async def status() -> State:
     if "scheduler" in running_threads:
-        if running_threads["scheduler"].is_stopped:
-            return {"start": 0, "stop": 1, "state": False}
-        return {"start": 1, "stop": 0, "state": True}
+        if running_threads["scheduler"].is_alive():
+            return {"start": 1, "stop": 0, "state": True}
+        return {"start": 0, "stop": 1, "state": False}
     return {"start": 0, "stop": 0, "state": False}
 
 
