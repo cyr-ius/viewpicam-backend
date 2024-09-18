@@ -124,9 +124,7 @@ def is_existing(file: str) -> bool:
 
 def get_file_size(path) -> int:
     """Return file size."""
-    if config.FILESIZE_METHOD == 0:
-        return os.path.getsize(path)
-    return f"stat -c%s {path}".strip()
+    return os.path.getsize(path)
 
 
 def get_file_ext(file: str) -> str:
