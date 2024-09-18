@@ -57,7 +57,9 @@ class Config(BaseSettings):
     MASK_FILENAME: str = "motionmask.pgm"
 
     # Url and timeout to fetch version from github
-    GIT_URL: str = "https://api.github.com/repos/cyr-ius/viewpicam-backend/releases/latest"
+    GIT_URL: str = (
+        "https://api.github.com/repos/cyr-ius/viewpicam-backend/releases/latest"
+    )
     TIMEOUT: int = 10
 
     # File where default settings
@@ -66,6 +68,10 @@ class Config(BaseSettings):
     RASPI_BINARY: str = "/usr/bin/raspimjpeg"
     RSYNC_BINARY: str = "/usr/bin/rsync"
 
+    # Character used to flatten file paths
+    THUMBNAIL_EXT = ".th.jpg"
+
+    # Database URI
     SQLALCHEMY_DATABASE_URI: str = f"sqlite:///{CONFIG_FOLDER}/config.db"
 
     # Userlevel
