@@ -94,10 +94,10 @@ jobs:
     
       - name: Inspect Docker image
         run: |
-          docker buildx imagetools inspect ${{ matrix.image }}:sha256@${{ steps.build.outputs.digest }}
+          docker buildx imagetools inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha256@${{ steps.build.outputs.digest }}
 
       - name: Test Docker image
-        run: docker run --rm "${{ matrix.image }}:sha256@${{ steps.build.outputs.digest }}" --version
+        run: docker run --rm "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha256@${{ steps.build.outputs.digest }}" --version
 
       - name: Export digest
         run: |
@@ -108,7 +108,7 @@ jobs:
       - name: Upload digest
         uses: actions/upload-artifact@v4
         with:
-          name: digests-${{ matrix.base }}-${{ matrix.platform-pair }}
+          name: digests-${{ matrix.tag }}
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1          
