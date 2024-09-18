@@ -36,11 +36,10 @@ jobs:
       id-token: write
     strategy:
       matrix:
-        include:
-          - platform: linux/arm/v6
-            tag: armv6
-          - platform: linux/arm/v7
-            tag: armhf
+        - platform: linux/arm/v6
+          tag: armv6
+        - platform: linux/arm/v7
+          tag: armhf
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -68,9 +67,9 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          platforms: ${{ matrix.include.platform }}
+          platforms: ${{ matrix.platform }}
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}-${{ matrix.include.tag }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}-${{ matrix.tag }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=${{ env.IMAGE_NAME }}-${{ matrix.include.tag }}
           cache-to: type=gha,scope=${{ env.IMAGE_NAME }}-${{ matrix.include.tag }},mode=max
