@@ -90,33 +90,13 @@ jobs:
             BUILDTIME=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
             VERSION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
             REVISION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}
-          outputs: type=image,name=target,push-by-digest=true,name-canonical=true,push=true,annotation-index.org.opencontainers.image.description=${{ env.IMAGE_DESCRIPTION }}
-      - name: Export digest
-        run: |
-          mkdir -p /tmp/digests
-          digest="${{ steps.build.outputs.digest }}"
-          touch "/tmp/digests/${digest#sha256:}"          
-      
-      - name: Upload digest
-        uses: actions/upload-artifact@v4
-        with:
-          name: digests-${{ matrix.tag }}
-          path: /tmp/digests/*
-          if-no-files-found: error
-          retention-days: 1 
+          outputs: type=image,name=target,annotation-index.org.opencontainers.image.description=${{ env.IMAGE_DESCRIPTION }}
           
   release:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     needs: build
-    steps:
-      - name: Download digests
-        uses: actions/download-artifact@v4
-        with:
-          path: /tmp/digests
-          pattern: digests-*
-          merge-multiple: true
-      
+    steps:      
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       
