@@ -5,6 +5,7 @@ import time
 
 from fastapi import APIRouter, HTTPException, Query
 
+from app.core.config import config
 from app.core.raspiconfig import RaspiConfigError, raspiconfig
 from app.models import Command
 
@@ -46,12 +47,12 @@ async def get_status(last: str = Query(description="Last content", default=None)
     file_content = ""
     if not os.path.isfile(raspiconfig.status_file):
         raise HTTPException(422, "Status file not found.")
-    for _ in range(0, 30):
+    for _ in range(0, config.RETRY_STATUS):
         with open(raspiconfig.status_file, encoding="utf-8") as file:
             file_content = file.read()
             if file_content != last:
                 break
-            time.sleep(0.1)
+            time.sleep(config.SLEEP_STATUS)
             file.close()
     os.popen(f"touch {raspiconfig.status_file}")
     return {"status": str(file_content)}

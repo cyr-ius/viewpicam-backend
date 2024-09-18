@@ -147,5 +147,8 @@ class Config(BaseSettings):
         "on_area_detected",
     ]
 
+    RETRY_STATUS: int = 10
+    SLEEP_STATUS: float = 0.01
+
 
 config = Config()
