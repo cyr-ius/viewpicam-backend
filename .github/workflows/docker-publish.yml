@@ -72,8 +72,8 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}-${{ matrix.tag }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=${{ env.IMAGE_NAME }}-${{ matrix.include.tag }}
-          cache-to: type=gha,scope=${{ env.IMAGE_NAME }}-${{ matrix.include.tag }},mode=max
+          cache-from: type=gha,scope=${{ env.IMAGE_NAME }}-${{ matrix.tag }}
+          cache-to: type=gha,scope=${{ env.IMAGE_NAME }}-${{ matrix.tag }},mode=max
           build-args: |
             BUILDTIME=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
             VERSION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
