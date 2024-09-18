@@ -107,13 +107,10 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
- 
-      - name: Create manifest list and push
-        working-directory: /tmp/digests
+  
+      - name: Create GHCR manifest
         run: |
-          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf '${{ env.IMAGE_NAME }}@sha256:%s ' *)          
-      
-      - name: Inspect image
-        run: |
-          docker buildx imagetools inspect ${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
+          docker manifest create ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.version }} \
+            ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.version }}-linux-armv6 \
+            ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.version }}-linux-armhf
+
