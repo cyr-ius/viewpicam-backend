@@ -54,7 +54,7 @@ ADD requirements.txt requirements.txt
 
 # Install pip requirements
 RUN /env/bin/pip3 install --upgrade pip wheel
-RUN MAKEFLAGS="-j$(nproc)" /env/bin/pip3 install --no-cache-dir -r requirements.txt -v
+RUN /env/bin/pip3 install --no-cache-dir -r requirements.txt
 
 COPY alembic /app/alembic
 COPY alembic.ini /app/alembic.ini
