@@ -36,10 +36,11 @@ jobs:
       id-token: write
     strategy:
       matrix:
-        - platform: linux/arm/v6
-          tag: armv6
-        - platform: linux/arm/v7
-          tag: armhf
+        include:
+          - platform: linux/arm/v6
+            tag: armv6
+          - platform: linux/arm/v7
+            tag: armhf
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
