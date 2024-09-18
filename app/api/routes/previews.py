@@ -27,7 +27,7 @@ async def get(
 
 
 @router.delete("/")
-async def delete(session: SessionDep, files: list[Files]) -> list[int]:
+async def delete(session: SessionDep, files: list[str]) -> list[str]:
     """Delete all files or files list"""
     deleted_ids = []
     if files:
