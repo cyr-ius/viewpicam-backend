@@ -69,7 +69,7 @@ class Config(BaseSettings):
     RSYNC_BINARY: str = "/usr/bin/rsync"
 
     # Character used to flatten file paths
-    THUMBNAIL_EXT = ".th.jpg"
+    THUMBNAIL_EXT: str = ".th.jpg"
 
     # Database URI
     SQLALCHEMY_DATABASE_URI: str = f"sqlite:///{CONFIG_FOLDER}/config.db"
