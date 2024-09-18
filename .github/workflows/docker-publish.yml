@@ -90,8 +90,28 @@ jobs:
             BUILDTIME=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
             VERSION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
             REVISION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}
-          outputs: type=image,name=target,annotation-index.org.opencontainers.image.description=${{ env.IMAGE_DESCRIPTION }}
-          
+          outputs: type=image,name=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true      
+    
+      - name: Inspect Docker image
+        run: |
+          docker buildx imagetools inspect ${{ matrix.image }}:sha256@${{ steps.build.outputs.digest }}
+
+      - name: Test Docker image
+        run: docker run --rm "${{ matrix.image }}:sha256@${{ steps.build.outputs.digest }}" --version
+
+      - name: Export digest
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ matrix.base }}-${{ matrix.platform-pair }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1          
   release:
     runs-on: ubuntu-latest
     permissions:
