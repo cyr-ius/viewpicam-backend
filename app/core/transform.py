@@ -94,7 +94,7 @@ def get_thumbs(sort_order: str, show_types: str, time_filter: int):
                 .order_by(order)
             )
 
-    return files.all()
+        return files.all()
 
 
 def check_media_path(filename):
