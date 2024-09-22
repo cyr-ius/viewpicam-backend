@@ -102,8 +102,8 @@ async def post_convert(session: SessionDep, id: str):
     video_convert(thumb.name)
 
 
-@router.post("/zipfile", status_code=204)
-async def post(session: SessionDep, thumbs: list[str] | str):
+@router.post("/zipfile", response_class=StreamingResponse, responses={200: {"content": {"application/zip": {}} }})
+async def post_zipfile(session: SessionDep, thumbs: list[str] | str):
     """Make Zip from thumbs list."""
     date_str = dt.now().strftime("%Y%m%d_%H%M%S")
     zipname = f"cam_{date_str}.zip"

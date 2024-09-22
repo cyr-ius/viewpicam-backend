@@ -29,7 +29,7 @@ async def delete():
         raise HTTPException(422, error)
 
 
-@router.get("/download")
+@router.get("/download", response_class=FileResponse, responses={200: {"content": {"text/plain": {}} }})
 async def download():
     """Log."""
     date_str = dt.now().strftime("%Y%m%d_%H%M%S")

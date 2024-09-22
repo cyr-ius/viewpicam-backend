@@ -64,8 +64,9 @@ async def post_macro(macro: Macro):
             raise HTTPException(422, error.args[0].strerror)
 
 
-@router.get("/backup")
+@router.get("/backup", response_class=StreamingResponse, responses={200: {"content": {"application/zip": {}} }})
 async def get_backup():
+    """Get backup."""
     date_str = dt.now().strftime("%Y%m%d_%H%M%S")
     zipname = f"config_{date_str}.zip"
     zip_file = zip_folder(config.CONFIG_FOLDER)
@@ -76,6 +77,7 @@ async def get_backup():
 
 @router.post("/restore", status_code=204)
 async def post_restore(session: SessionDep, file: UploadFile):
+    """Upload backup file."""
     if file and allowed_file(file):
         zip_extract(file.file, config.CONFIG_FOLDER)
         session.exec(delete(Files))
