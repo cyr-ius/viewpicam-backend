@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Security
 
-from app.api.depends import get_current_user
+from app.api.depends import get_camera_token, get_current_user
 from app.api.routes import (
     authorize,
     buttons,
@@ -31,7 +31,7 @@ api_router.include_router(
     camera.router,
     prefix="/cam",
     tags=["camera"],
-    dependencies=[Security(get_current_user)],
+    dependencies=[Security(get_camera_token)],
 )
 api_router.include_router(
     logs.router,

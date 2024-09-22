@@ -3,7 +3,7 @@ from typing import Annotated
 
 import jwt
 from fastapi import Depends, HTTPException, Security, status
-from fastapi.security import APIKeyCookie, HTTPBearer
+from fastapi.security import APIKeyCookie, APIKeyQuery, HTTPBearer
 from jwt.exceptions import InvalidTokenError
 from pydantic import ValidationError
 from sqlmodel import Session, select
@@ -51,6 +51,27 @@ async def protected(
 
 
 TokenDep = Annotated[str, Security(protected)]
+
+
+async def cam_protected(
+    key_result=Depends(APIKeyCookie(name="x-api-key", auto_error=False)),
+    jwt_result=Depends(HTTPBearer(auto_error=False)),
+    cam_result=Depends(APIKeyQuery(name="cam_token", auto_error=False)),
+):
+    if not (cam_result or key_result or jwt_result):
+        raise HTTPException(status_code=403, detail="Not authenticated")
+
+    return cam_result or key_result or jwt_result
+
+
+CamTokenDep = Annotated[str, Security(cam_protected)]
+
+
+def get_camera_token(session: SessionDep, cam_protected: CamTokenDep) -> User:
+    user = session.exec(select(User).filter(User.cam_token == cam_protected)).first()
+    if user:
+        return user
+    user = get_current_user(session, cam_protected)
 
 
 def get_current_user(session: SessionDep, token: TokenDep) -> User:
