@@ -11,14 +11,14 @@ from app.core.process import execute_cmd
 from app.core.raspiconfig import RaspiConfigError, raspiconfig
 from app.core.utils import disk_usage
 from app.exceptions import ViewPiCamException
-from app.models import Command, FreeDisk, Presets
+from app.models import Command, FreeDisk, Presets, UserLevel
 
 router = APIRouter()
 
 
 @router.post("/restart", status_code=204)
 async def post_restart():
-    """Execute command."""
+    """Restart system."""
     try:
         execute_cmd("echo s > /proc/sysrq-trigger")
         execute_cmd("echo b > /proc/sysrq-trigger")
@@ -26,9 +26,15 @@ async def post_restart():
         raise HTTPException(422, error)
 
 
+@router.post("/reset", status_code=204)
+async def reset():
+    """Reset application."""
+    pass
+
+
 @router.post("/shutdown", status_code=204)
 async def post_halted():
-    """Execute command."""
+    """Halt system."""
     try:
         execute_cmd("echo s > /proc/sysrq-trigger")
         execute_cmd("echo o > /proc/sysrq-trigger")
@@ -38,7 +44,7 @@ async def post_halted():
 
 @router.post("/restart/app", status_code=204)
 async def post_restart_app():
-    """Execute command."""
+    """Restart application."""
     try:
         execute_cmd("killall gunicorn")
     except ViewPiCamException as error:
@@ -115,6 +121,6 @@ async def get_presets(
 
 
 @router.get("/userlevel")
-async def get_userlevel():
+async def get_userlevel() -> list[UserLevel]:
     """Get user level."""
-    return [{"name": k, "right": v} for k, v in config.USERLEVEL.items()]
+    return [UserLevel(name=key, right=value) for key, value in config.USERLEVEL.items()]
