@@ -19,13 +19,13 @@ from app.core.utils import set_timezone
 from app.exceptions import ViewPiCamException
 from app.models import (
     Calendar,
-    Date_Time,
+    DayTime,
+    GMT_Offset,
     Period,
     Schedule,
     Scheduler,
     SchedulerUpdate,
     SchedulerWithCalendars,
-    Settings,
 )
 
 router = APIRouter()
@@ -66,15 +66,30 @@ async def put_scheduler(session: SessionDep, scheduler: list[SchedulerUpdate]):
         schedule.command_off = item.command_off
         schedule.mode = item.mode
         schedule.calendars = []
-        for key, value in item.calendars.items():
+        for key, value in item.calendars:
             if value:
                 cal = session.exec(
                     select(Calendar).filter_by(name=key.capitalize())
                 ).first()
                 schedule.calendars.append(cal)
-        session.commit()
+        session.add(schedule)
+    session.commit()
 
     send_pipe(config.SCHEDULE_RESET)
+
+
+@router.get("/scheduler/{daymode_id}")
+async def get_scheduler(
+    session: SessionDep, daymode_id: int
+) -> list[SchedulerWithCalendars]:
+    """Get settings scheduler."""
+    return session.exec(select(Scheduler).filter_by(daysmode_id=daymode_id)).all()
+
+
+@router.get("/scheduler")
+async def get_schedulers(session: SessionDep) -> list[SchedulerWithCalendars]:
+    """Get all schedulers."""
+    return session.get_all(Scheduler)
 
 
 @router.get("/period/{id}", status_code=201)
@@ -82,26 +97,26 @@ async def get_period(session: SessionDep, id: int | None = None) -> Period:
     """Post day mode and return period."""
     if id not in [0, 1, 2]:
         raise HTTPException(422, "Daymode not exist")
-    return {"period": get_calendar(session, id)}
+    return Period.model_validate({"period": get_calendar(session, id)})
 
 
 @router.get("/sun/sunrise", status_code=201)
-async def get_sunrise(session: SessionDep) -> Date_Time:
+async def get_sunrise() -> DayTime:
     """Get sunrise datetime."""
-    return {"datetime": sun_info(session, "sunrise")}
+    return DayTime.model_validate({"day_time": sun_info("sunrise")})
 
 
 @router.get("/sun/sunset", status_code=201)
-async def get_sunset(session: SessionDep) -> Date_Time:
+async def get_sunset() -> DayTime:
     """Get sunset datetime."""
-    return {"datetime": sun_info(session, "sunset")}
+    return DayTime.model_validate({"day_time": sun_info("sunset")})
 
 
 @router.get("/gmtoffset", status_code=201)
-async def get_gmtoffset(session: SessionDep):
+async def get_gmtoffset() -> GMT_Offset:
     """GMT Offset."""
     data = read()
-    return {"gmt_offset": data["gmt_offset"]}
+    return GMT_Offset.model_validate({"gmt_offset": data["gmt_offset"]})
 
 
 @router.get("/timezones", status_code=201)
@@ -109,17 +124,6 @@ async def get_timezone() -> list[str]:
     """Timezone."""
     timezones = zoneinfo.available_timezones()
     return list(timezones)
-
-
-@router.get("/scheduler")
-@router.get("/scheduler/{daymode_id}")
-async def get_scheduler(
-    session: SessionDep, daymode_id: int | None = None
-) -> list[SchedulerWithCalendars]:
-    """Get settings scheduler."""
-    if daymode_id is not None:
-        return session.exec(select(Scheduler).filter_by(daysmode_id=daymode_id)).all()
-    return session.get_all(Scheduler)
 
 
 def time_offset(offset: int | float | str = 0) -> td:
@@ -141,7 +145,7 @@ def utc_offset(offset) -> timezone:
 
 def dt_now() -> dt:
     """Get current local time."""
-    now = dt.utcnow()
+    now = dt.now(timezone.utc)
     gmt_offset = config.GMT_OFFSET
 
     if gmt_offset:
@@ -150,7 +154,7 @@ def dt_now() -> dt:
     return now
 
 
-def sun_info(session: SessionDep, mode: str) -> dt:
+def sun_info(mode: str) -> dt:
     """Return sunset or sunrise datetime."""
     data = read()
     offset = time_offset(data["gmt_offset"])
@@ -165,8 +169,8 @@ def sun_info(session: SessionDep, mode: str) -> dt:
 def get_calendar(session: SessionDep, daymode: int) -> int:
     """Get calendar."""
     now = dt_now()
-    sunrise = sun_info(session, "sunrise")
-    sunset = sun_info(session, "sunset")
+    sunrise = sun_info("sunrise")
+    sunset = sun_info("sunset")
     data = read()
 
     match daymode:
