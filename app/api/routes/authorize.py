@@ -4,9 +4,7 @@ from __future__ import annotations
 
 import random
 from datetime import datetime as dt
-from datetime import timezone
 
-import jwt
 from fastapi import (
     APIRouter,
     HTTPException,
@@ -24,7 +22,7 @@ from app.core.security import (
     hash_password,
     verify_password,
 )
-from app.models import ApiToken, CameraToken, Login, Register, TokenInfo, User
+from app.models import CameraToken, Login, Register, TokenInfo, User, UserPublic
 
 router = APIRouter()
 
@@ -57,7 +55,7 @@ already_exists = HTTPException(
 @router.post("/authorize", status_code=200)
 async def authorize(
     session: SessionDep, login: Login, response: Response
-) -> TokenInfo | str:
+) -> TokenInfo | None:
     user = session.exec(select(User).filter_by(name=login.username)).first()
 
     if user is None or user.enabled is False:
@@ -68,7 +66,7 @@ async def authorize(
 
     if user.otp_confirmed and login.otp_code is None:
         response.status_code = 202
-        return "OTP Required"
+        return
     elif user.otp_confirmed and TOTP(user.otp_secret).verify(login.otp_code) is False:
         raise otp_exception
 
@@ -92,7 +90,7 @@ async def authorize(
 
 
 @router.get("/userinfo")
-async def read_users_me(current_user: CurrentUser) -> User:
+async def read_users_me(current_user: CurrentUser) -> UserPublic:
     return current_user
 
 
@@ -165,40 +163,5 @@ async def delete_cam_token(session: SessionDep, current_user: CurrentUser):
     """Delete camera token."""
     db_user = session.get(User, current_user.id)
     db_user.sqlmodel_update({"cam_token": None})
-    session.add(db_user)
-    session.commit()
-
-
-@router.get("/token")
-async def get_api_token(session: SessionDep, current_user: CurrentUser) -> ApiToken:
-    """Get token."""
-    db_user = session.get(User, current_user.id)
-    return db_user
-
-
-@router.post("/token", status_code=204)
-async def post_api_token(session: SessionDep, current_user: CurrentUser):
-    """Create token."""
-    db_user = session.get(User, current_user.id)
-    api_token = jwt.encode(
-        payload={
-            "iss": "ViewPiCam",
-            "sub": "system",
-            "id": 1,
-            "iat": dt.now(tz=timezone.utc),
-        },
-        key=config.SECRET_KEY,
-        algorithm="HS256",
-    )
-    db_user.sqlmodel_update({"api_token": api_token})
-    session.add(db_user)
-    session.commit()
-
-
-@router.delete("/token", status_code=204)
-async def delete_api_token(session: SessionDep, current_user: CurrentUser):
-    """Delete token."""
-    db_user = session.get(User, current_user.id)
-    db_user.sqlmodel_update({"api_token": None})
     session.add(db_user)
     session.commit()
