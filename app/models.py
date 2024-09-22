@@ -5,7 +5,7 @@ from datetime import datetime as dt
 
 import qrcode
 import qrcode.image.svg
-from pydantic import BaseModel, field_serializer
+from pydantic import BaseModel, PrivateAttr, field_serializer
 from sqlmodel import JSON, Column, Field, Relationship, SQLModel
 
 from app.core.config import Level, Locale, Type
@@ -46,12 +46,12 @@ class ButtonPublic(ButtonBase):
 
 
 class ButtonUpdate(SQLModel):
-    name: str | None = Field(description="Button name")
-    macro: str | None = Field(description="Script name")
+    name: str | None = Field(description="Button name", default=None)
+    macro: str | None = Field(description="Script name", default=None)
     style: str | None = Field(description="Class", default=None)
     other: str | None = Field(description="Style", default=None)
     css_class: str | None = Field(description="Others options", default=None)
-    display: bool | None = Field(default=False, description="Display button")
+    display: bool | None = Field(description="Display button", default=None)
 
 
 # -- Files --
@@ -66,8 +66,11 @@ class FileBase(SQLModel):
     locked: bool = Field(description="Read/Write right on disk", default=False)
     realname: str = Field(index=True, unique=True)
     number: str = Field(description="Index")
-    lapse_count: int | None = Field(description="image numbers of timelapse")
-    duration: int | None = Field(description="image numbers of timelapse")
+    lapse_count: int | None = Field(
+        description="image numbers of timelapse", default=None
+    )
+    duration: int | None = Field(description="image numbers of timelapse", default=None)
+    _selected: bool | None = PrivateAttr(default=None)
 
 
 class Files(FileBase, table=True):
@@ -84,16 +87,20 @@ class FilePublic(FileBase):
 
 
 class FileUpdate(SQLModel):
-    name: str | None = Field(index=True, unique=True, description="File name")
-    type: str | None = Field(description="I/T/V")
-    size: int | None = Field(description="Size")
-    icon: str | None = Field(description="Icon")
-    datetime: dt | None = Field(description="DateTime")
-    locked: bool | None = Field(description="Read/Write right on disk", default=False)
-    realname: str | None = Field(index=True, unique=True)
-    number: str | None = Field(description="Index")
-    lapse_count: int | None = Field(description="image numbers of timelapse")
-    duration: int | None = Field(description="image numbers of timelapse")
+    name: str | None = Field(
+        index=True, unique=True, description="File name", default=None
+    )
+    type: str | None = Field(description="I/T/V", default=None)
+    size: int | None = Field(description="Size", default=None)
+    icon: str | None = Field(description="Icon", default=None)
+    datetime: dt | None = Field(description="DateTime", default=None)
+    locked: bool | None = Field(description="Read/Write right on disk", default=None)
+    realname: str | None = Field(index=True, unique=True, default=None)
+    number: str | None = Field(description="Index", default=None)
+    lapse_count: int | None = Field(
+        description="image numbers of timelapse", default=None
+    )
+    duration: int | None = Field(description="image numbers of timelapse", default=None)
 
 
 # -- Multiview --
@@ -119,9 +126,9 @@ class MultiviewPublic(MultiviewsBase):
 
 
 class MultiviewUpdate(SQLModel):
-    delay: int | None = Field(description="Delay")
-    state: int | None = Field(description="State visible")
-    url: str | None = Field(description="Url")
+    delay: int | None = Field(description="Delay", default=None)
+    state: int | None = Field(description="State visible", default=None)
+    url: str | None = Field(description="Url", default=None)
 
 
 # -- Users --
@@ -248,7 +255,7 @@ class SchedulerUpdate(SQLModel):
     period: str | None = None
     daysmode_id: int | None = None
     daysmode: "DaysMode"
-    calendars: dict[str, int | bool]
+    calendars: "Week"
 
 
 class Week(BaseModel):
@@ -301,8 +308,12 @@ class Config(BaseModel):
         use_enum_values = True
 
 
-class Date_Time(BaseModel):
-    datetime: dt
+class DayTime(BaseModel):
+    day_time: dt
+
+
+class GMT_Offset(BaseModel):
+    gmt_offset: str
 
 
 class FreeDisk(BaseModel):
@@ -352,16 +363,14 @@ class Login(BaseModel):
 class Macro(BaseModel):
     name: str = Field(description="Macro name")
     command: str = Field(description="Script execute")
-    state: bool = Field(description="Enable", default=False)
+    state: bool = Field(description="State")
 
 
 class Otp(BaseModel):
     id: int = Field(description="Id")
     name: str = Field(description="The user name")
     otp_confirmed: bool = Field(description="otp status", default=False)
-    otp_secret: str | None = Field(
-        description="QR Code picture", default=None, alias="otp_svg"
-    )
+    otp_secret: str = Field(description="QR Code picture", alias="otp_svg")
 
     @field_serializer("otp_secret")
     def serializer_otp_svg(self, obj, _info) -> str:
@@ -429,3 +438,8 @@ class Schedule(BaseModel):
 
 class Secret(BaseModel):
     secret: str = Field(description="OTP code")
+
+
+class UserLevel(BaseModel):
+    name: str
+    right: int
