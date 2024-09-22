@@ -37,15 +37,13 @@ async def post(config: Config):
 @router.get("/macros")
 async def get_macro() -> list[Macro]:
     """Get macros."""
-    list_macros = []
+    macros = []
     config = await _async_get_config()
     for key, value in config.items():
-        state = True
-        if value[:1] == "-":
+        if state := (value[:1] == "-"):
             value = value[1:]
-            state = False
-        list_macros.append({"name": key, "command": value, "state": state})
-    return list_macros
+        macros.append(Macro(name=key, command=value, state=not state))
+    return macros
 
 
 @router.post("/macros", status_code=204)
@@ -63,7 +61,7 @@ async def post_macro(macro: Macro):
         try:
             raspiconfig.send(f"um {idx} {cmd}")
         except RaspiConfigError as error:
-            raise HTTPException(500, error)
+            raise HTTPException(422, error.args[0].strerror)
 
 
 @router.get("/backup")
