@@ -11,7 +11,7 @@ python-multipart==0.0.9
 pytz==2024.2
 qrcode==7.4.2
 semver==3.0.2
-sqlalchemy==2.0.34
+sqlalchemy==2.0.35
 sqlmodel==0.0.22
 suntime==1.2.5
 uvicorn==0.30.6
