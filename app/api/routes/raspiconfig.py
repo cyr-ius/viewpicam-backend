@@ -1,15 +1,18 @@
 """Api system."""
 
+import asyncio
+import logging
 import os
 import time
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, WebSocket, WebSocketDisconnect
 
 from app.core.config import config
 from app.core.raspiconfig import RaspiConfigError, raspiconfig
 from app.models import Command
 
 router = APIRouter()
+logger = logging.getLogger("uvicorn.error")
 
 
 @router.get("/")
@@ -56,3 +59,18 @@ async def get_status(last: str = Query(description="Last content", default=None)
             file.close()
     os.popen(f"touch {raspiconfig.status_file}")
     return {"status": str(file_content)}
+
+
+@router.websocket("/status")
+async def websocket_endpoint(websocket: WebSocket):
+    """Websocket status"""
+    await websocket.accept()
+    try:
+        while True:
+            await asyncio.sleep(0.25)
+            with open(raspiconfig.status_file, "r") as file:
+                file_content = file.read()
+            await websocket.send_json(file_content)
+
+    except WebSocketDisconnect:
+        logger.info("WebSocket disconnected")

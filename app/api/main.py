@@ -16,6 +16,7 @@ from app.api.routes import (
     system,
     totp,
     users,
+    websocket,
 )
 from app.daemon import backgroundtask
 
@@ -102,3 +103,4 @@ api_router.include_router(
     tags=["tasks"],
     dependencies=[Security(get_current_user)],
 )
+api_router.include_router(websocket.router, prefix="/ws", tags=["websocket"])
