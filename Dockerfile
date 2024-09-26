@@ -45,7 +45,8 @@ ENV PYTHONUNBUFFERED=1
 RUN apk add --no-cache --virtual build build-base python3-dev cmake make gcc linux-headers ninja git rust cargo libressl-dev
 
 # Venv python
-RUN python3 -m venv --system-site-packages --upgrade-deps /env
+# RUN python3 -m venv --system-site-packages --upgrade-deps /env
+RUN python3 -m venv /env
 ENV VIRTUAL_ENV=/env
 ENV PATH=$PATH:/env/bin
 
@@ -55,6 +56,9 @@ ADD requirements.txt requirements.txt
 # Install pip requirements
 RUN /env/bin/pip3 install --upgrade pip wheel
 RUN /env/bin/pip3 install --no-cache-dir -r requirements.txt
+
+# clean content
+RUN apk del build
 
 COPY alembic /app/alembic
 COPY alembic.ini /app/alembic.ini
