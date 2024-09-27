@@ -55,7 +55,7 @@ ADD requirements.txt requirements.txt
 
 # Install pip requirements
 RUN /env/bin/pip3 install --upgrade pip wheel
-RUN /env/bin/pip3 install pydantic -vvv --no-cache-dir
+RUN /env/bin/pip3 install cython pydantic -vvv --no-cache-dir
 RUN /env/bin/pip3 install -v --no-cache-dir -r requirements.txt
 
 # clean content
