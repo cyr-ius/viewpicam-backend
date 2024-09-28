@@ -8,6 +8,7 @@ from datetime import datetime as dt
 from fastapi import (
     APIRouter,
     HTTPException,
+    Request,
     Response,
     status,
 )
@@ -54,7 +55,7 @@ already_exists = HTTPException(
 
 @router.post("/authorize", status_code=200)
 async def authorize(
-    session: SessionDep, login: Login, response: Response
+    session: SessionDep, login: Login, response: Response, request: Request
 ) -> TokenInfo | None:
     user = session.exec(select(User).filter_by(name=login.username)).first()
 
@@ -74,10 +75,12 @@ async def authorize(
         user.name, id=user.id, otp_confirmed=(user.otp_confirmed == 1)
     )
 
+    secure_flag = request.scope.get("scheme", "http") == "https"
+
     response.set_cookie(
         "x-api-key",
         jwtoken,
-        secure=True,
+        secure=secure_flag,
         httponly=True,
         samesite="strict",
         expires=expires_in,
