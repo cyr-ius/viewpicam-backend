@@ -6,6 +6,7 @@ import logging
 
 from fastapi import FastAPI
 from fastapi.routing import APIRoute
+from fastapi.staticfiles import StaticFiles
 
 from app.api.main import api_router
 from app.core.config import config
@@ -41,6 +42,8 @@ app = FastAPI(
     docs_url="/api/v1/docs",
     redoc_url="/api/v1/redoc",
 )
+
+app.mount("/data", StaticFiles(directory="data"), name="data")
 
 # Start Raspiconfig
 if config.SVC_RASPIMJPEG and not get_pid(config.RASPI_BINARY):
