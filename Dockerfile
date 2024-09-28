@@ -45,8 +45,7 @@ ENV PYTHONUNBUFFERED=1
 RUN apk add --no-cache --virtual build build-base python3-dev cmake make gcc linux-headers ninja git rust cargo libressl-dev
 
 # Venv python
-# RUN python3 -m venv --system-site-packages --upgrade-deps /env
-RUN python3 -m venv /env
+RUN python3 -m venv --system-site-packages --upgrade-deps /env
 ENV VIRTUAL_ENV=/env
 ENV PATH=$PATH:/env/bin
 
@@ -55,8 +54,7 @@ ADD requirements.txt requirements.txt
 
 # Install pip requirements
 RUN /env/bin/pip3 install --upgrade pip wheel
-RUN MAKEFLAGS="-j$(nproc)" /env/bin/pip3 install pydantic -v --no-cache-dir
-RUN /env/bin/pip3 install -v --no-cache-dir -r requirements.txt
+RUN MAKEFLAGS="-j$(nproc)" /env/bin/pip3 install -v --no-cache-dir -r requirements.txt
 
 # clean content
 RUN apk del build
