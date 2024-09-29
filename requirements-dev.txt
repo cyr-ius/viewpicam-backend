@@ -1,3 +1,4 @@
+-r requirements-deps.txt
 -r requirements.txt
 
 codespell>=2.2.2
