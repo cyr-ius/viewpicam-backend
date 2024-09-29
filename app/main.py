@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import threading
 
 from fastapi import FastAPI
 from fastapi.routing import APIRoute
@@ -15,7 +16,7 @@ from app.core.process import get_pid
 from app.core.raspiconfig import raspiconfig
 from app.core.settings import read
 from app.core.utils import set_timezone
-from app.daemon.backgroundtask import main_start
+from app.daemon.backgroundtask import main_start, watchdog_task
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -58,3 +59,7 @@ app.include_router(api_router, prefix=config.API_V1_STR)
 
 # Load initial configuration
 set_initial_config()
+
+# Watchdog scheduler
+watchdog = threading.Thread(target=watchdog_task, name="Watchdog", daemon=True)
+watchdog.start()
