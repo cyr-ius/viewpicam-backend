@@ -49,12 +49,18 @@ RUN python3 -m venv --system-site-packages --upgrade-deps /env
 ENV VIRTUAL_ENV=/env
 ENV PATH=$PATH:/env/bin
 
+# Update pip wheel
+RUN /env/bin/pip3 install --upgrade pip wheel
+
+# Add dependencies
+ADD requirements-deps.txt requirements-deps.txt
+# Install pip requirements
+RUN /env/bin/pip3 install -v --no-cache-dir -r requirements-deps.txt
+
 # Add binaries and sources
 ADD requirements.txt requirements.txt
-
 # Install pip requirements
-RUN /env/bin/pip3 install --upgrade pip wheel
-RUN MAKEFLAGS="-j$(nproc)" /env/bin/pip3 install -v --no-cache-dir -r requirements.txt
+RUN /env/bin/pip3 install -v --no-cache-dir -r requirements.txt
 
 # clean content
 RUN apk del build
