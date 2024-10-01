@@ -5,3 +5,4 @@ sqlalchemy==2.0.35
 sqlmodel==0.0.22
 uvicorn==0.31.0
 pydantic-core==2.24.0
+pydantic==2.9.2
