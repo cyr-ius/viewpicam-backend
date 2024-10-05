@@ -123,7 +123,9 @@ async def get_gmtoffset() -> GMT_Offset:
 async def get_timezone() -> list[str]:
     """Timezone."""
     timezones = zoneinfo.available_timezones()
-    return list(timezones)
+    timezone_array = list(timezones)
+    timezone_array.sort()
+    return timezone_array
 
 
 def time_offset(offset: int | float | str = 0) -> td:
