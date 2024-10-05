@@ -1,6 +1,6 @@
 """Api scheduler."""
 
-from datetime import datetime as dt
+from datetime import datetime as dt, timedelta
 from datetime import timedelta as td
 from datetime import timezone
 
@@ -162,7 +162,7 @@ def sun_info(mode: str) -> dt:
     offset = time_offset(data["gmt_offset"])
     sun = Sun(data["latitude"], data["longitude"])
     if mode.lower() == "sunset":
-        sun_time = sun.get_sunset_time()
+        sun_time = sun.get_sunset_time(dt.now() + timedelta(days=1))
     else:
         sun_time = sun.get_sunrise_time()
     return sun_time.replace(tzinfo=utc_offset(offset.seconds)) + offset
