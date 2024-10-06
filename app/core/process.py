@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import asyncio
 import fnmatch
+import os
 from subprocess import PIPE, Popen
 
-from psutil import ZombieProcess, process_iter
+from psutil import Process, ZombieProcess, process_iter
 
 from app.exceptions import ViewPiCamException
 
@@ -32,3 +34,9 @@ def execute_cmd(cmd: str) -> None:
         err = error.decode("utf-8").replace("\n", "")
         raise ViewPiCamException(f"Error execute command ({err})")
     return output.decode("utf-8")
+
+
+async def self_terminate():
+    await asyncio.sleep(1)
+    parent = Process(Process(os.getpid()).ppid())
+    parent.kill()

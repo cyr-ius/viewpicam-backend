@@ -7,7 +7,7 @@ from sqlmodel import select
 
 from app.api.depends import SessionDep
 from app.core.config import Locale, Type, config
-from app.core.process import execute_cmd
+from app.core.process import execute_cmd, self_terminate
 from app.core.raspiconfig import RaspiConfigError, raspiconfig
 from app.core.utils import disk_usage
 from app.exceptions import ViewPiCamException
@@ -46,7 +46,7 @@ async def post_halted():
 async def post_restart_app():
     """Restart application."""
     try:
-        execute_cmd("killall gunicorn")
+        await self_terminate()
     except ViewPiCamException as error:
         raise HTTPException(422, error)
 
