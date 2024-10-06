@@ -18,6 +18,31 @@ WORKDIR /app/userland
 RUN sed -i 's/sudo//g' buildme
 RUN /bin/bash -c ./buildme
 
+
+# ------------- Builder python ---------------
+FROM python:3.12-alpine as python-builder
+
+WORKDIR /app
+
+# Add binaries and sources
+ADD requirements.txt requirements.txt
+
+# Venv python
+RUN python3 -m venv --system-site-packages --upgrade-deps /env
+ENV VIRTUAL_ENV=/env
+ENV PATH=$PATH:/env/bin
+
+# Keeps Python from generating .pyc files in the container
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Turns off buffering for easier container logging
+ENV PYTHONUNBUFFERED=1
+
+# Install dependencies
+RUN apk add --no-cache --virtual build build-base python3-dev cmake make gcc linux-headers ninja git rust cargo libressl-dev libffi-dev
+RUN /env/bin/pip3 install --upgrade pip wheel
+RUN /env/bin/pip3 install -v --no-cache-dir -r requirements.txt
+
 # ------------- MAIN ---------------
 FROM python:3.12-alpine
 
@@ -28,43 +53,13 @@ COPY --from=builder /app/gpac-master/bin/gcc/MP4Box /usr/bin
 COPY --from=builder /app/gpac-master/bin/gcc/gpac /usr/bin
 COPY --from=builder /app/userland/build/bin /usr/bin
 COPY --from=builder /app/userland/build/lib /usr/lib
+COPY --from=python-builder /env /env
 
 # set version label
 LABEL org.opencontainers.image.source="https://github.com/cyr-ius/viewpicam2"
 LABEL org.opencontainers.image.description="Backend Viewpicam - inspired by Rpi Cam Interface"
 LABEL org.opencontainers.image.licenses="MIT"
 LABEL maintaine="cyr-ius"
-
-# Keeps Python from generating .pyc files in the container
-ENV PYTHONDONTWRITEBYTECODE=1
-
-# Turns off buffering for easier container logging
-ENV PYTHONUNBUFFERED=1
-
-# Install dependencies
-RUN apk add --no-cache --virtual build build-base python3-dev cmake make gcc linux-headers ninja git rust cargo libressl-dev libffi-dev
-
-# Venv python
-RUN python3 -m venv --system-site-packages --upgrade-deps /env
-ENV VIRTUAL_ENV=/env
-ENV PATH=$PATH:/env/bin
-
-# Update pip wheel
-RUN /env/bin/pip3 install --upgrade pip wheel
-
-# Add dependencies
-ADD requirements-deps.txt requirements-deps.txt
-# Install pip requirements
-RUN /env/bin/pip3 install -v --no-cache-dir -r requirements-deps.txt
-
-# Add binaries and sources
-ADD requirements.txt requirements.txt
-# Install pip requirements
-RUN /env/bin/pip3 install -v --no-cache-dir -r requirements.txt
-
-# clean content
-RUN apk del build
-RUN rm -rf /root/.cache /root/.cargo
 
 COPY alembic /app/alembic
 COPY alembic.ini /app/alembic.ini
@@ -85,6 +80,8 @@ VOLUME /app/config
 
 ARG VERSION
 ENV VERSION=${VERSION}
+ENV VIRTUAL_ENV="/env"
+ENV PATH="/env/bin:$PATH"
 
 EXPOSE 8000/tcp
 ENTRYPOINT ["/docker-entrypoint.sh"]
