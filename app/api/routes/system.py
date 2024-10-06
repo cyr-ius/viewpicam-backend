@@ -29,7 +29,13 @@ async def post_restart():
 @router.post("/reset", status_code=204)
 async def reset():
     """Reset application."""
-    pass
+    try:
+        execute_cmd("rm -f /data/*")
+        execute_cmd("rm -f /h264/*")
+        execute_cmd("rm -f /config/*")
+        await self_terminate()
+    except ViewPiCamException as error:
+        raise HTTPException(422, error)
 
 
 @router.post("/shutdown", status_code=204)
