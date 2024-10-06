@@ -64,6 +64,7 @@ RUN /env/bin/pip3 install -v --no-cache-dir -r requirements.txt
 
 # clean content
 RUN apk del build
+RUN rm -rf /root/.cache /root/.cargo
 
 COPY alembic /app/alembic
 COPY alembic.ini /app/alembic.ini
