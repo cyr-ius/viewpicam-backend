@@ -20,7 +20,7 @@ RUN /bin/bash -c ./buildme
 
 
 # ------------- Builder python ---------------
-FROM python:3.12-alpine as python-builder
+FROM python:3.12-alpine AS python-builder
 
 WORKDIR /app
 
