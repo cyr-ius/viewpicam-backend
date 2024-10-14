@@ -1,4 +1,4 @@
-aiohttp==3.10.8
+aiohttp==3.10.10
 atomicwrites==1.4.1
 psutil==6.0.0
 pyjwt==2.9.0
