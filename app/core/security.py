@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from datetime import datetime as dt
 from datetime import timedelta, timezone
+from hashlib import scrypt
 
 import jwt
-from pyargon2 import hash
 
 from app.core.config import config
 
@@ -14,11 +14,18 @@ ALGORITHM = "HS256"
 
 
 def hash_password(password):
-    return hash(password, config.SECRET_KEY)
+    return scrypt(
+        password.encode(), salt=config.SECRET_KEY.encode(), n=16384, r=8, p=1
+    ).hex()
 
 
 def verify_password(password, known_hash):
-    return hash(password, config.SECRET_KEY) == known_hash
+    return (
+        scrypt(
+            password.encode(), salt=config.SECRET_KEY.encode(), n=16384, r=8, p=1
+        ).hex()
+        == known_hash
+    )
 
 
 def create_access_token(sub, **kwargs) -> tuple[str, dt]:
