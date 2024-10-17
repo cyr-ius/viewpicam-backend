@@ -6,7 +6,7 @@ from datetime import datetime as dt
 from datetime import timedelta, timezone
 
 import jwt
-from argon2 import PasswordHasher
+from pyargon2 import hash
 
 from app.core.config import config
 
@@ -14,13 +14,11 @@ ALGORITHM = "HS256"
 
 
 def hash_password(password):
-    ph = PasswordHasher()
-    return ph.hash(password)
+    return hash(password, config.SECRET_KEY)
 
 
 def verify_password(password, known_hash):
-    ph = PasswordHasher()
-    return ph.verify(known_hash, password)
+    return hash(password, config.SECRET_KEY) == known_hash
 
 
 def create_access_token(sub, **kwargs) -> tuple[str, dt]:
