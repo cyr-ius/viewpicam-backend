@@ -2,7 +2,7 @@
 
 import configparser
 
-from aiohttp import ClientError, ClientResponse, ClientSession
+from httpx import AsyncClient, HTTPError
 
 from app.core.config import config
 from app.core.process import get_pid
@@ -18,7 +18,7 @@ async def async_get_motion() -> configparser.ConfigParser:
     return await async_parse_ini(rsp_txt)
 
 
-async def async_set_motion(key: str, value: [str | bool | int | float]) -> None:
+async def async_set_motion(key: str, value: str | bool | int | float) -> None:
     """set motion parameter."""
     await async_get(f"{config.MOTION_URL}/config/set?{key}={value}")
 
@@ -38,22 +38,21 @@ async def async_start_motion() -> None:
     await async_get(f"{config.MOTION_URL}/config/start")
 
 
-async def async_restart_motion() -> ClientResponse:
+async def async_restart_motion() -> configparser.ConfigParser:
     """set motion parameter."""
     await async_get(f"{config.MOTION_URL}/config/restart")
     rsp_text = await async_get(f"{config.MOTION_URL}/config/list")
     return await async_parse_ini(rsp_text)
 
 
-async def async_get(url: str) -> str | None:
+async def async_get(url: str) -> str:
     """Get request."""
     try:
-        async with ClientSession() as session:
-            async with session.get(url) as response:
-                response.raise_for_status()
-    except (ValueError, ClientError) as error:
+        async with AsyncClient() as client:
+            response = await client.get(url)
+    except (ValueError, HTTPError) as error:
         raise MotionError(error) from error
-    return await response.text()
+    return response.text()
 
 
 async def async_parse_ini(raw_config: str) -> configparser.ConfigParser:

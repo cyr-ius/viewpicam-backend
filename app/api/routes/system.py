@@ -1,8 +1,9 @@
 """Api system."""
 
+import httpx
 import semver
-from aiohttp import ClientError, ClientSession
 from fastapi import APIRouter, HTTPException, Query
+from httpx import HTTPError
 from sqlmodel import select
 
 from app.api.depends import SessionDep
@@ -77,10 +78,9 @@ async def post_command(command: Command):
 async def get_version():
     """Get version."""
     try:
-        async with ClientSession() as session:
-            async with session.get(config.GIT_URL) as response:
-                response.raise_for_status()
-                rjson = await response.json()
+        async with httpx.AsyncClient() as client:
+            response = await client.get(config.GIT_URL)
+            rjson = response.json()
 
         rjson["app_version"] = rjson.get("tag_name").replace("v", "")
         current_version = config.VERSION.replace("v", "")
@@ -93,7 +93,7 @@ async def get_version():
             }
         )
         return rjson
-    except (ValueError, ClientError) as error:
+    except (ValueError, HTTPError) as error:
         raise HTTPException(422, str(error))
 
 
