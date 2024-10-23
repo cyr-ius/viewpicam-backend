@@ -57,9 +57,7 @@ class Config(BaseSettings):
     MASK_FILENAME: str = "motionmask.pgm"
 
     # Url and timeout to fetch version from github
-    GIT_URL: str = (
-        "https://api.github.com/repos/cyr-ius/viewpicam-backend/releases/latest"
-    )
+    GIT_URL: str = "https://api.github.com/repos/cyr-ius/viewpicam/releases/latest"
     TIMEOUT: int = 10
 
     # File where default settings
