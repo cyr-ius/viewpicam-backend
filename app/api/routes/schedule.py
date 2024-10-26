@@ -9,7 +9,7 @@ import pytz
 import zoneinfo
 from fastapi import APIRouter, HTTPException
 from sqlmodel import select
-from suntime import Sun
+from suntime import Sun, SunTimeException
 from timezonefinder import TimezoneFinder
 
 from app.api.depends import SessionDep
@@ -178,10 +178,25 @@ def sun_info(mode: str) -> dt:
     data = read()
     offset = time_offset(data["gmt_offset"])
     sun = Sun(data["latitude"], data["longitude"])
-    if mode.lower() == "sunset":
-        sun_time = sun.get_sunset_time(dt.now() + td(days=1))
-    else:
-        sun_time = sun.get_sunrise_time()
+    try:
+        sun_time = (
+            sun.get_sunset_time(dt.now() + td(days=1))
+            if mode.lower() == "sunset"
+            else sun.get_sunrise_time()
+        )
+    except SunTimeException:
+        if mode.lower() == "sunset":
+            return dt.now().replace(
+                hour=23,
+                minute=59,
+                second=59,
+                microsecond=0,
+                tzinfo=utc_offset(offset.seconds),
+            )
+        return dt.now().replace(
+            hour=0, minute=0, second=0, microsecond=0, tzinfo=utc_offset(offset.seconds)
+        )
+
     return sun_time.replace(tzinfo=utc_offset(offset.seconds)) + offset
 
 
