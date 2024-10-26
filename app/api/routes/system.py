@@ -82,8 +82,8 @@ async def get_version():
             response = await client.get(config.GIT_URL)
             rjson = response.json()
 
-        rjson["app_version"] = rjson.get("tag_name").replace("v", "")
         current_version = config.VERSION.replace("v", "")
+        rjson["app_version"] = rjson.get("tag_name", config.VERSION).replace("v", "")
         rjson.update(
             {
                 "current_version": current_version,
