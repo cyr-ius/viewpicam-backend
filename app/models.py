@@ -422,9 +422,9 @@ class Schedule(BaseModel):
     daymode: int
     daystart_minutes: int
     duskend_minutes: int
-    gmt_offset: str | None = None
-    latitude: float | None = None
-    longitude: float | None = None
+    gmt_offset: str
+    latitude: float
+    longitude: float
     management_command: str | None = None
     management_interval: int
     max_capture: int

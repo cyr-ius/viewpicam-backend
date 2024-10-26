@@ -1,6 +1,7 @@
 """Api scheduler."""
 
-from datetime import datetime as dt, timedelta
+import time
+from datetime import datetime as dt
 from datetime import timedelta as td
 from datetime import timezone
 
@@ -44,7 +45,7 @@ async def put(schedule: Schedule):
     cur_tz = data["gmt_offset"]
     write(schedule.model_dump())
 
-    if (new_tz := data["gmt_offset"]) != cur_tz:
+    if (new_tz := schedule.gmt_offset) != cur_tz:
         try:
             set_timezone(new_tz)
         except ViewPiCamException as error:
@@ -128,6 +129,12 @@ async def get_timezone() -> list[str]:
     return timezone_array
 
 
+@router.get("/jstime", status_code=201)
+async def get_time() -> int:
+    """Return Javascript datetime with timezone."""
+    return int(time.mktime(dt_now().timetuple())) * 1000
+
+
 def time_offset(offset: int | float | str = 0) -> td:
     """Get time offset."""
     if isinstance(offset, (int, float)):
@@ -148,7 +155,8 @@ def utc_offset(offset) -> timezone:
 def dt_now() -> dt:
     """Get current local time."""
     now = dt.now(timezone.utc)
-    gmt_offset = config.GMT_OFFSET
+    data = read()
+    gmt_offset = data.get("gmt_offset", config.GMT_OFFSET)
 
     if gmt_offset:
         offset = time_offset(gmt_offset)
@@ -162,7 +170,7 @@ def sun_info(mode: str) -> dt:
     offset = time_offset(data["gmt_offset"])
     sun = Sun(data["latitude"], data["longitude"])
     if mode.lower() == "sunset":
-        sun_time = sun.get_sunset_time(dt.now() + timedelta(days=1))
+        sun_time = sun.get_sunset_time(dt.now() + td(days=1))
     else:
         sun_time = sun.get_sunrise_time()
     return sun_time.replace(tzinfo=utc_offset(offset.seconds)) + offset
