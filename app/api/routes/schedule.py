@@ -10,6 +10,7 @@ import zoneinfo
 from fastapi import APIRouter, HTTPException
 from sqlmodel import select
 from suntime import Sun
+from timezonefinder import TimezoneFinder
 
 from app.api.depends import SessionDep
 from app.core.config import config
@@ -20,6 +21,7 @@ from app.core.utils import set_timezone
 from app.exceptions import ViewPiCamException
 from app.models import (
     Calendar,
+    Coordinates,
     DayTime,
     GMT_Offset,
     Period,
@@ -133,6 +135,13 @@ async def get_timezone() -> list[str]:
 async def get_time() -> int:
     """Return Javascript datetime with timezone."""
     return int(time.mktime(dt_now().timetuple())) * 1000
+
+
+@router.post("/timezonefinder", status_code=201)
+async def post_timezonefinder(coordinates: Coordinates) -> str:
+    """Detect timezone with coordinates."""
+    tf = TimezoneFinder()
+    return tf.timezone_at(lng=coordinates.longitude, lat=coordinates.latitude)
 
 
 def time_offset(offset: int | float | str = 0) -> td:

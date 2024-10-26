@@ -443,3 +443,8 @@ class Secret(BaseModel):
 class UserLevel(BaseModel):
     name: str
     right: int
+
+
+class Coordinates(BaseModel):
+    latitude: float
+    longitude: float
