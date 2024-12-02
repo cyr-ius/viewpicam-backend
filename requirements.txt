@@ -6,7 +6,7 @@ psutil==6.1.0
 pydantic-settings==2.6.1
 pyjwt==2.10.1
 pyotp==2.9.0
-python-multipart==0.0.17
+python-multipart==0.0.19
 pytz==2024.2
 qrcode==8.0
 semver==3.0.2
