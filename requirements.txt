@@ -18,4 +18,4 @@ sqlalchemy==2.0.40
 sqlmodel==0.0.24
 suntime==1.3.2
 uvicorn==0.34.0
-timezonefinder==6.5.7
+timezonefinder==6.5.9
