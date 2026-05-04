@@ -3,4 +3,4 @@
 codespell>=2.4.2
 ruff>=0.15.12
 yamllint>=1.38.0
-pre-commit>=3.6.0
+pre-commit>=4.6.0
