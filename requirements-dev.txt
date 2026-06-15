@@ -1,6 +1,6 @@
 -r requirements.txt
 
 codespell>=2.4.2
-ruff>=0.15.16
+ruff>=0.15.17
 yamllint>=1.38.0
 pre-commit>=4.6.0
