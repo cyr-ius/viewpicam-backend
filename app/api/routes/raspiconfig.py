@@ -50,7 +50,7 @@ async def get_status(last: str = Query(description="Last content", default=None)
     file_content = ""
     if not os.path.isfile(raspiconfig.status_file):
         raise HTTPException(422, "Status file not found.")
-    for _ in range(0, config.RETRY_STATUS):
+    for _ in range(config.RETRY_STATUS):
         with open(raspiconfig.status_file, encoding="utf-8") as file:
             file_content = file.read()
             if file_content != last:

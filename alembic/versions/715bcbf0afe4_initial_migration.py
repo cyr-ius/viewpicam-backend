@@ -7,6 +7,7 @@ Create Date: 2024-02-24 15:46:29.109800
 """
 
 import sqlalchemy as sa
+
 from alembic import op
 
 # revision identifiers, used by Alembic.
@@ -502,8 +503,8 @@ def seed_data():
         sa.sql.column("calendar_id", sa.Integer),
     )
     calendar = []
-    for i in range(0, 29):
-        for j in range(0, 7):
+    for i in range(29):
+        for j in range(7):
             calendar.append({"scheduler_id": i, "calendar_id": j})
     op.bulk_insert(scheduler_calendar, calendar)
 
