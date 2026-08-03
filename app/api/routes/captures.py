@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-
 from fastapi import APIRouter, HTTPException, Request
 
 from app.core.raspiconfig import RaspiConfigError, raspiconfig
