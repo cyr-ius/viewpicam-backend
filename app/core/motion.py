@@ -18,7 +18,7 @@ async def async_get_motion() -> configparser.ConfigParser:
     return await async_parse_ini(rsp_txt)
 
 
-async def async_set_motion(key: str, value: str | bool | int | float) -> None:
+async def async_set_motion(key: str, value: str | bool | float) -> None:
     """set motion parameter."""
     await async_get(f"{config.MOTION_URL}/config/set?{key}={value}")
 

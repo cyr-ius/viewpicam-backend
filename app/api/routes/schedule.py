@@ -1,12 +1,12 @@
 """Api scheduler."""
 
 import time
+import zoneinfo
 from datetime import datetime as dt
 from datetime import timedelta as td
 from datetime import timezone
 
 import pytz
-import zoneinfo
 from fastapi import APIRouter, HTTPException
 from sqlmodel import select
 from suntime import Sun, SunTimeException
@@ -51,7 +51,7 @@ async def put(schedule: Schedule):
         try:
             set_timezone(new_tz)
         except ViewPiCamException as error:
-            write_log(f"[Timezone] {str(error)}", "error")
+            write_log(f"[Timezone] {error!s}", "error")
 
     set_log_level(data["loglevel"])
 
@@ -144,7 +144,7 @@ async def post_timezonefinder(coordinates: Coordinates) -> str:
     return tf.timezone_at(lng=coordinates.longitude, lat=coordinates.latitude)
 
 
-def time_offset(offset: int | float | str = 0) -> td:
+def time_offset(offset: float | str = 0) -> td:
     """Get time offset."""
     if isinstance(offset, (int, float)):
         noffset = td(hours=offset)
