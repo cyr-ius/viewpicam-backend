@@ -15,7 +15,7 @@ alembic==1.20.0
 fastapi[standard]==0.142.2
 pydantic-settings==2.15.0
 sqlalchemy==2.1.0
-sqlmodel==0.0.42
+sqlmodel==0.0.47
 suntime==1.4.0
 uvicorn==0.52.4
 timezonefinder==9.0.0
