@@ -14,7 +14,7 @@ suntime==1.4.0
 alembic==1.20.1
 fastapi[standard]==0.162.0
 pydantic-settings==2.16.2
-sqlalchemy==2.1.6
+sqlalchemy==2.1.8
 sqlmodel==0.0.48
 suntime==1.4.0
 uvicorn==0.54.0
